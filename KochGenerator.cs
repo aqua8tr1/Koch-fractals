@@ -21,11 +21,25 @@ Hexagon,
 Hepagon,
 Octagon
 };
+
+public struct LineSegment //okay... what is a struct?? structs are similar to a class. classes are reference types, structs are  value types.   value types are types that are declared as a variable, but reference types hold the memory adress, or reference to a variable
+{
+public Vector3 StartPosition{ get; set; }
+public Vector3 EndPosition { get; set; }
+public Vector3 Direction {get; set; }
+public float Length { get; set; }
+
+}
+
 [SerializeField]
 protected _initiator initiator = new _initiator(); 
 [SerializeField]
-protected AnimationCurve _generator;
+protected AnimationCurve _generator; // using animation curve makes it easier to create new generators in the inspector
+protected Keyframe[] _keys; 
 
+protected int _generationCount;
+
+//Basically Vector3s are used...
 protected int _initiatorPointAmount;
 private Vector3[] _initiatorPoint;
 private Vector3 _rotateVector;
@@ -35,11 +49,18 @@ private float _initialRotation;
 protected float _initiatorSize;
 
 protected Vector3[] _position;
+protected Vector3[] _targetPosition; 
+private List<LineSegment> _lineSegment;
 
 private void Awake()
 {
+
 GetInitiatorPoints();   
+//assign the lists and arrays!
 _position = new Vector3[_initiatorPointAmount + 1];
+_targetPosition = new Vector3[_initiatorPointAmount + 1];
+_lineSegment = new List<LineSegment>();
+_keys = _generator.keys;
 
 
 _rotateVector = Quaternion.AngleAxis(_initialRotation, _rotateAxis) * _rotateVector;
@@ -51,6 +72,45 @@ _position[_initiatorPointAmount] = _position[0];
 
 }
 
+protected void KochGenerator(Vector3[] positions, bool outwords, float generatorMultiplier)
+{
+      _lineSegment.Clear();
+      for(int i = 0; i < postions.Length - 1; i++)
+      {
+         LineSegment line = new LineSegment();
+      line.StartPosition = position[i];
+      if(i == positions.Length - 1){
+         line.EndPosition = positions[0];
+
+      } else {
+      line.EndPositionPosition = position[i + 1];
+      }
+      line.Direction = (line.EndPosition - line.StartPosition).normalized;
+      line.length = Vector3.Distance(line.EndPosition, line.StartPosition);
+      _lineSegment.add(line);
+
+      }
+      //adding the line segment points to the array of lines
+      list<Vector3> newPos = new list<Vector3>();
+      list<Vector3> targetPos = new list<Vector3>();
+      for(int i = 0; i < _lineSegment.Count; i++){
+         newPos.Add(_lineSegment[i].StartPosition);
+          targetPos.Add(_lineSegment[i].StartPosition);
+
+          for(int j = 1; j < keys.length - 1; j++){
+            float moveAmount = _lineSegment[i].Length * _keys[j].time;
+            float heightAmount = (_lineSegment[i].Length * _keys[j].value) * generatorMultiplier;
+            Vector3 movePos = _lineSegment[i].StartPosition + (_lineSegment[i].Direction * moveAmount);
+            Vector3 Dir;
+            if(outwords){
+               Dir = Quaternion.AngleAxis(-90, _rotateAxis) * _lineSegment[i].Direction;
+            } else {
+               Dir = Quaternion.AngleAxis(-0, _rotateAxis) * _lineSegment[i].Direction;
+            }
+            newPos.add(movePos);
+          }
+      }
+}
 
 private void OnDrawGizmos(){
 GetInitiatorPoints();   

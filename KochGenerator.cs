@@ -72,7 +72,7 @@ _position[_initiatorPointAmount] = _position[0];
 
 }
 
-protected void KochGenerator(Vector3[] positions, bool outwords, float generatorMultiplier)
+protected void KochGenerate(Vector3[] positions, bool outwords, float generatorMultiplier)
 {
       _lineSegment.Clear();
       for(int i = 0; i < postions.Length - 1; i++)
@@ -91,13 +91,13 @@ protected void KochGenerator(Vector3[] positions, bool outwords, float generator
 
       }
       //adding the line segment points to the array of lines
-      list<Vector3> newPos = new list<Vector3>();
-      list<Vector3> targetPos = new list<Vector3>();
+      List<Vector3> newPos = new List<Vector3>();
+      List<Vector3> targetPos = new List<Vector3>();
       for(int i = 0; i < _lineSegment.Count; i++){
          newPos.Add(_lineSegment[i].StartPosition);
           targetPos.Add(_lineSegment[i].StartPosition);
 
-          for(int j = 1; j < keys.length - 1; j++){
+          for(int j = 1; j < _keys.length - 1; j++){
             float moveAmount = _lineSegment[i].Length * _keys[j].time;
             float heightAmount = (_lineSegment[i].Length * _keys[j].value) * generatorMultiplier;
             Vector3 movePos = _lineSegment[i].StartPosition + (_lineSegment[i].Direction * moveAmount);
@@ -108,8 +108,17 @@ protected void KochGenerator(Vector3[] positions, bool outwords, float generator
                Dir = Quaternion.AngleAxis(-0, _rotateAxis) * _lineSegment[i].Direction;
             }
             newPos.add(movePos);
+            targetPos.add(movePos + (Dir * heightAmount));
           }
       }
+      newPos.add(_lineSegment[0].StartPosition);
+      targetPos.add(_lineSegment[0].StartPosition);
+      _position = new Vector3[newPos.Count];
+      _targetPosition = new Vector3[targetPos.Count];
+      _position = newPos.ToArray();
+      _targetPosition = targetPos.ToArray();
+
+      _generationCount++;
 }
 
 private void OnDrawGizmos(){

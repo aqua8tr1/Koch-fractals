@@ -75,19 +75,19 @@ _position[_initiatorPointAmount] = _position[0];
 protected void KochGenerate(Vector3[] positions, bool outwords, float generatorMultiplier)
 {
       _lineSegment.Clear();
-      for(int i = 0; i < postions.Length - 1; i++)
+      for(int i = 0; i < positions.Length - 1; i++)
       {
          LineSegment line = new LineSegment();
-      line.StartPosition = position[i];
+      line.StartPosition = positions[i];
       if(i == positions.Length - 1){
          line.EndPosition = positions[0];
 
       } else {
-      line.EndPositionPosition = position[i + 1];
+      line.EndPosition = positions[i + 1];
       }
       line.Direction = (line.EndPosition - line.StartPosition).normalized;
-      line.length = Vector3.Distance(line.EndPosition, line.StartPosition);
-      _lineSegment.add(line);
+      line.Length = Vector3.Distance(line.EndPosition, line.StartPosition);
+      _lineSegment.Add(line);
 
       }
       //adding the line segment points to the array of lines
@@ -97,7 +97,7 @@ protected void KochGenerate(Vector3[] positions, bool outwords, float generatorM
          newPos.Add(_lineSegment[i].StartPosition);
           targetPos.Add(_lineSegment[i].StartPosition);
 
-          for(int j = 1; j < _keys.length - 1; j++){
+          for(int j = 1; j < _keys.Length - 1; j++){
             float moveAmount = _lineSegment[i].Length * _keys[j].time;
             float heightAmount = (_lineSegment[i].Length * _keys[j].value) * generatorMultiplier;
             Vector3 movePos = _lineSegment[i].StartPosition + (_lineSegment[i].Direction * moveAmount);
@@ -107,12 +107,12 @@ protected void KochGenerate(Vector3[] positions, bool outwords, float generatorM
             } else {
                Dir = Quaternion.AngleAxis(-0, _rotateAxis) * _lineSegment[i].Direction;
             }
-            newPos.add(movePos);
-            targetPos.add(movePos + (Dir * heightAmount));
+            newPos.Add(movePos);
+            targetPos.Add(movePos + (Dir * heightAmount));
           }
       }
-      newPos.add(_lineSegment[0].StartPosition);
-      targetPos.add(_lineSegment[0].StartPosition);
+      newPos.Add(_lineSegment[0].StartPosition);
+      targetPos.Add(_lineSegment[0].StartPosition);
       _position = new Vector3[newPos.Count];
       _targetPosition = new Vector3[targetPos.Count];
       _position = newPos.ToArray();

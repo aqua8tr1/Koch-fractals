@@ -14,6 +14,7 @@ ZAxis
 protected _axis axis = new _axis();
 
 protected enum _initiator{
+Circle, 
 Triangle,
 Square,
 Pentagon,
@@ -36,6 +37,11 @@ protected _initiator initiator = new _initiator();
 [SerializeField]
 protected AnimationCurve _generator; // using animation curve makes it easier to create new generators in the inspector
 protected Keyframe[] _keys; 
+[SerializeField]
+protected bool _useBezierCurves;
+[SerializeField]
+[Range(8, 24)]
+protected int _bezierVertexCount;
 
 protected int _generationCount;
 
@@ -50,7 +56,27 @@ protected float _initiatorSize;
 
 protected Vector3[] _position;
 protected Vector3[] _targetPosition; 
+protected Vector3[] _bezierPosition;
 private List<LineSegment> _lineSegment;
+
+protected Vector3[] BezierCurve(Vector3[] points, int vertexCount)
+{
+   var pointList = new List<Vector3>();
+   for(int i = 0; i < points.Length; i+=2)
+   {
+      if(i + 2 <= points.Length - 1)
+      {
+         for(float ratio = 0f; ratio <= 1; ratio += 1.0f/vertexCount)
+         {
+            var tangentLineVertex1 = Vector3.Lerp(points[i], points[i + 1], ratio);
+            var tangentLineVertex2 = Vector3.Lerp(points[i + 1], points[i + 2], ratio);
+            var bezierPoint = Vector3.Lerp(tangentLineVertex1, tangentLineVertex2, ratio);
+            pointList.Add(bezierPoint);
+         }
+      }
+   }
+   return pointList.ToArray();
+}
 
 private void Awake()
 {
@@ -69,6 +95,7 @@ _position[i] =  _rotateVector *  _initiatorSize;
 _rotateVector = Quaternion.AngleAxis(360 / _initiatorPointAmount, _rotateAxis) * _rotateVector;
 }
 _position[_initiatorPointAmount] = _position[0];
+_targetPosition = _position;
 
 }
 
@@ -117,6 +144,7 @@ protected void KochGenerate(Vector3[] positions, bool outwords, float generatorM
       _targetPosition = new Vector3[targetPos.Count];
       _position = newPos.ToArray();
       _targetPosition = targetPos.ToArray();
+      _bezierPosition = BezierCurve(_targetPosition, _bezierVertexCount);
 
       _generationCount++;
 }
@@ -152,6 +180,10 @@ Gizmos.DrawLine(_initiatorPoint[i], _initiatorPoint[i + 1]);//see if it's not th
 private void GetInitiatorPoints(){
 
     switch(initiator){
+         case _initiator.Circle:
+        _initiatorPointAmount = 100;
+        _initialRotation = 3.6f;
+            break;
         case _initiator.Triangle:
         _initiatorPointAmount = 3;
         _initialRotation = 0;
